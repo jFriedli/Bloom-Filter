@@ -1,0 +1,62 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Bloom Filter Dokumentation}
+\author{Malte Gerboth, Jonas Friedli }
+\date{06.12.2019}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{subcaption} 
+
+\begin{document}
+
+\maketitle
+
+\section{Idee des Bloom Filters}
+Die Idee des Bloom-Filters ist eine Datenstruktur, mit der effizient festgestellt werden kann, ob ein Datensatz zum ersten Mal auftritt oder bereits vorgekommen ist. Durch den Einsatz von Hashfunktionen wird ein «Fingerabdruck» für jeden Datensatz in einer Hashtabelle gespeichert.
+Die wichtigste Eigenschaft des Bloom-Filters ist es eine absolute Aussage darüber, ob ein Datensatz noch nicht behandelt wurde. 
+Wiederum kann das Verfahren nur eine Vermutung dazu geben, ob ein Datensatz vorhanden ist. 
+Das Verfahren löst also nicht eine vollständige Suche ab, sondern wird meistens in Kombination eingesetzt. Durch diesen Zwischenschritt entfällt ein Teil der aufwändigen vollständigen Suche. Dieser Vorteil kommt noch mehr zum Tragen, wenn Elemente der Datenmenge selten entfernt oder geändert werden.
+Der Bloom-Filter kann hinsichtlich seiner Effizienz durch einen optimalen Einsatz des Hash Algorithmus und einer abgestimmten Auswahl der Parameter bestmöglich optimiert werden.
+Der erste Parameter der einen wesentlichen Einfluss auf die Effizienz hat, ist der Füllgrad des Speichersets. Wenn dieser beinahe vollständig gefüllt ist, werden keine weiteren Anfragen ein negatives Ergebnis besitzen und deshalb muss dann eine vollständige Überprüfung ausgeführt werden. Dies gilt es mit einer ausreichenden Grösse des Speichersets zu vermeiden.
+Der zweite Parameter beschreibt die Anzahl der Hashfunktionen. Diese wird für jeden Datensatz einzeln berechnet. Um den Berechnungsaufwand möglichst gering zu halten, wird die minimal benötigte Anzahl an Hashfunktionen verwendet. Bei dem Hash Algorithmus gilt es einen möglichst effizienten zu verwenden.
+Bei der Initialisierung wird für jeden Datenwert durch die Hashfunktionen Indizes berechnet. Durch den die Modulo Rechnung werden diese Indizes passend auf die Grösse des Speichersets berechnet.
+Für die Wahl der beiden Parameter gibt es Hilfestellungen für die optimale Dimensionierung anhand der potenziell verwendeten Datensätze (n). Die sogenannte false-positive-Rate (p) gibt an, wie hoch die Wahrscheinlichkeit für einen falsches positives Ergebnis ist.
+
+
+\textbf{Vorteile:}
+\begin{itemize}
+  \item Ein Bloom-Filter braucht nur wenig Speicher.
+  \item Eine einfache Implementierung und liefert eine schnelle Optimierung für das passenden Anwendung Szenario.
+  \item Reduziert aufwändige Suchanfragen, wenn Datensätze nicht vorhanden sind.
+  \item Die Asymptotische Komplexität O(k) umfasst das Einfügen und Prüfen von Datensätzen. Das k beschreibt die Anzahl der Haschfunktionen, wobei die Komplexität unabhängig von der Anzahl der Dantesätze ist.
+\end{itemize}
+
+\textbf{Nachteile:}
+\begin{itemize}
+  \item Es ist nur möglich eine Aussage über nicht vorhandene Datensätze zu machen. Es wird keine Aussage über das definitive Enthalten gemacht. Man muss den Bloom-Filter, sofern erwünscht, immer in Kombination mit einer vollständigen Suche anwenden.
+  \item Bei Änderungen von vorhandenen Datensätzen eignet sich das Verfahren weniger, denn es ist nicht möglich Datensätze zu entfernen. Denn die Datensätze selbst werden nie in einem Bloom-Filter gespeichert.
+\end{itemize}
+
+\section{Beispiel aus der Praxis}
+Der Bloom-Filter wird von verschiedenen Herstellern für die Optimierung von Suchen eingesetzt. Beispielsweise bei Akamai, einem Anbieter für Online-Anwendungen und -Inhalte. Mit der Hilfe des Bloom-Filters werden Suchen identifiziert, welche sehr selten vorkommen oder einmalig sind. Die identifizierten Anfragen werden explizit nicht zwischengespeichert, damit können Ressourcen gespart werden.  
+
+Es werden nur Anfragen gespeichert die mindestens zwei Mal in einer bestimmten Periode auftreten. Dies wird durch das Speichern der angefragten Objekte im Bloom-Filter bewerkstelligt. Wenn ein Objekt von einem Client angefragt wird, dann prüft der Server zuerst ob dieses Objekt schon einmal behandelt wurde.
+
+
+\section{Fehlerwahrscheinlichkeit testen}
+Um den Bloom Filter zu testen haben wir neben den gegebenen Wörtern eine Liste mit weiteren Wörtern generiert. In unserem Beispiel sind es 50'000, da das etwa der Anzahl in der Textdatei entspricht. Die Wörter in der generierten Liste sind komplett Zufällig und müssen keine echten Wörter sein. Das ist nicht entscheiden. Diese Wörter wollen wir brauchen, um zu sehen, wie viele davon als false positive erkannt werden.
+
+Um diese Anzahl zu erhalten, testen wir zuerst bei jedem Wort, ob es in der Wörterliste existiert. Die Wahrscheinlichkeit das ein zufällig generiertes Wort mit einem aus der Datei übereinstimmt ist zwar klein, aber gäbe es so einen Fall, wäre es nicht ein false positive. Falls das Wort nicht in der Wörterliste existiert, testen wir, ob es im Bloom filter existiert. Hier ist klar, dass es nicht existieren sollte.
+
+Wir zählen die Anzahl false positive und geben es als Ausgabe aus. Erwartungsgemäss ist die Anzahl false positive immer etwa gleich gross, wie das p, welches man wählt.
+
+
+\begin{figure}
+  \caption{Ausgabe mit p 0.1}
+  \centering
+    \includegraphics[width=0.5\textwidth]{Ausgabe1.png}
+\end{figure}
+
+\end{document}
